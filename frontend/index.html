@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Business Card Print Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+        
+        /* Role tab interaction simulation */
+        .role-tab { transition: all 0.2s ease; }
+        .role-tab[data-active="true"] { background-color: white; color: #111827; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .role-tab[data-active="false"] { color: #6b7280; }
+        .role-tab[data-active="false"]:hover { color: #374151; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased h-screen overflow-hidden flex selection:bg-gray-200 selection:text-gray-900">
+
+    <!-- DASHBOARD VIEW (Behind Login Overlay) -->
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex-col hidden md:flex z-10 relative">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200">
+            <div class="text-xl font-semibold tracking-tighter text-gray-900">BCPMS</div>
+        </div>
+        
+        <div class="px-4 py-6 flex-1 overflow-y-auto">
+            <div class="text-xs font-medium text-gray-400 mb-3 px-2 tracking-wider uppercase">Menu</div>
+            <nav class="space-y-1">
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 bg-gray-100 rounded-md text-gray-900 text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:pie-chart-2-linear" class="text-lg"></iconify-icon>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:card-linear" class="text-lg"></iconify-icon>
+                    <span>Upload Requests</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:printer-linear" class="text-lg"></iconify-icon>
+                    <span>Printing Queue</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:routing-linear" class="text-lg"></iconify-icon>
+                    <span>Dispatch Management</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:box-linear" class="text-lg"></iconify-icon>
+                    <span>Print Templates</span>
+                </a>
+            </nav>
+
+            <div class="text-xs font-medium text-gray-400 mb-3 px-2 mt-8 tracking-wider uppercase">Administration</div>
+            <nav class="space-y-1">
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:users-group-rounded-linear" class="text-lg"></iconify-icon>
+                    <span>User Management</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                    <iconify-icon icon="solar:settings-linear" class="text-lg"></iconify-icon>
+                    <span>System Settings</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center space-x-3 px-2">
+                <div class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
+                    AD
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-gray-900">Admin User</div>
+                    <div class="text-xs text-gray-500">System Administrator</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative z-0">
+        <!-- Top Header -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-20">
+            <h1 class="text-xl font-medium tracking-tight text-gray-900">System Overview</h1>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden sm:block">
+                    <iconify-icon icon="solar:magnifer-linear" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    <input type="text" placeholder="Search requests, batches..." class="pl-9 pr-4 py-1.5 w-64 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:bg-white transition-all placeholder-gray-400">
+                </div>
+                <button class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-50">
+                    <iconify-icon icon="solar:bell-linear" class="text-xl"></iconify-icon>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Body -->
+        <div class="flex-1 overflow-y-auto p-8 bg-gray-50/50">
+            <div class="max-w-6xl mx-auto space-y-8">
+                
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Metric Card -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-500">Uploaded Files</span>
+                            <div class="p-2 bg-amber-50 rounded-lg text-amber-600">
+                                <iconify-icon icon="solar:file-check-linear" class="text-lg"></iconify-icon>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-2xl font-semibold tracking-tight text-gray-900">142</span>
+                            <span class="text-xs text-gray-500 font-medium">+12 today</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-500">Ready to Print</span>
+                            <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                                <iconify-icon icon="solar:printer-minimalistic-linear" class="text-lg"></iconify-icon>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-2xl font-semibold tracking-tight text-gray-900">3,045</span>
+                            <span class="text-xs text-blue-600 font-medium">Batch #402 Active</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-500">Printed Files</span>
+                            <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
+                                <iconify-icon icon="solar:routing-2-linear" class="text-lg"></iconify-icon>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-2xl font-semibold tracking-tight text-gray-900">890</span>
+                            <span class="text-xs text-gray-500 font-medium">Across 4 couriers</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card -->
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-500">Dispatched Files</span>
+                            <div class="p-2 bg-red-50 rounded-lg text-red-600">
+                                <iconify-icon icon="solar:danger-triangle-linear" class="text-lg"></iconify-icon>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <span class="text-2xl font-semibold tracking-tight text-gray-900">24</span>
+                            <span class="text-xs text-red-600 font-medium">Requires attention</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Table -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between bg-white">
+                        <h2 class="text-base font-medium tracking-tight text-gray-900">Recent Upload Requests</h2>
+                        <button class="text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 px-3 py-1.5 rounded-md shadow-sm transition-colors flex items-center space-x-2">
+                            <iconify-icon icon="solar:filter-linear"></iconify-icon>
+                            <span>Filter</span>
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50/50 border-b border-gray-200">
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Upload ID</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Branch Code</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Copies</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Upload Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8902</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Downtown Main</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Platinum Credit</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/50">
+                                            Uploaded
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 10:42 AM</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8901</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Westside Mall</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Standard Debit</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200/50">
+                                            Ready to Print
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 09:15 AM</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8899</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">North Hills</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Forex Travel</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200/50">
+                                            Printed
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Yesterday</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8890</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Airport Terminal</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Premium Debit</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/50">
+                                            Dispatched
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Oct 24, 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- LOGIN OVERLAY -->
+    <!-- This overlay represents the initial state. Clicking Sign In removes it to show the dashboard beneath. -->
+    <div id="login-overlay" class="fixed inset-0 z-50 bg-gray-50/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
+        
+        <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden relative">
+            
+            <!-- Subtle top accent -->
+            <div class="h-1 w-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 opacity-50"></div>
+            
+            <div class="p-8">
+                <div class="flex justify-center mb-8">
+                    <div class="text-2xl font-semibold tracking-tighter text-gray-900">Bank Business Card Print Management System</div>
+                </div>
+
+                <div class="text-center mb-6">
+                    <h2 class="text-lg font-medium tracking-tight text-gray-900">Welcome back</h2>
+                    <p class="text-sm text-gray-500 mt-1">Select your role to access the portal</p>
+                </div>
+
+                <!-- Role Selector (Segmented Control) -->
+                <div class="flex p-1 space-x-1 bg-gray-100/80 rounded-lg mb-6 border border-gray-200/50">
+                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="true" onclick="selectRole(this)">Admin</button>
+                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Bank Eployee</button>
+                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Printer</button>
+                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Dispatcher</button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); document.getElementById('login-overlay').style.opacity='0'; setTimeout(() => document.getElementById('login-overlay').remove(), 300);" class="space-y-4">
+                    
+                    <div class="space-y-1">
+                        <label for="username" class="block text-xs font-medium text-gray-700">Admin ID / Username</label>
+                        <input type="text" id="username" value="admin" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-shadow" placeholder="Enter your ID">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <label for="password" class="block text-xs font-medium text-gray-700">Password</label>
+                        </div>
+                        <input type="password" id="password" value="" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-shadow" placeholder="••••••••">
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 pb-4">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded cursor-pointer accent-gray-900">
+                            <label for="remember-me" class="ml-2 block text-xs text-gray-600 cursor-pointer">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="#" class="text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
+                        Sign In
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to handle role tab visual switching for the mockup
+        function selectRole(element) {
+            const tabs = document.querySelectorAll('.role-tab');
+            tabs.forEach(tab => tab.setAttribute('data-active', 'false'));
+            element.setAttribute('data-active', 'true');
+        }
+    </script>
+</body>
+</html>
