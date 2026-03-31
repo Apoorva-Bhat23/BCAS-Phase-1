@@ -3,57 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Business Card Print Management System</title>
+    <title>Business Card Automation System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        :root {
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --accent-indigo: #6366f1;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f8f8f6;
+            color: #111;
+        }
+
+        h1, h2, h3,
+        .serif { font-family: 'DM Serif Display', serif; }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
-        
-        /* Role tab interaction simulation */
-        .role-tab { transition: all 0.2s ease; }
-        .role-tab[data-active="true"] { background-color: white; color: #111827; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+
+        /* ─── Role tabs ─── */
+        .role-tab {
+            transition: all 0.22s cubic-bezier(.4,0,.2,1);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .role-tab[data-active="true"] {
+            background: #fff;
+            color: #111827;
+            box-shadow: 0 1px 4px rgba(0,0,0,.10);
+        }
         .role-tab[data-active="false"] { color: #6b7280; }
         .role-tab[data-active="false"]:hover { color: #374151; }
+
+        /* ─── Login overlay ─── */
+        #login-overlay {
+            transition: opacity 0.45s cubic-bezier(.4,0,.2,1), backdrop-filter 0.45s ease;
+        }
+        #login-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .login-card {
+            animation: loginDrop 0.55s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes loginDrop {
+            from { opacity: 0; transform: translateY(-28px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+
+        /* ─── Logout button lift ─── */
+        #logout-btn {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+        #logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,.18);
+        }
+
+        /* ─── Search bar expand ─── */
+        .search-input {
+            transition: width 0.3s cubic-bezier(.4,0,.2,1), background 0.2s, box-shadow 0.2s;
+            width: 200px;
+        }
+        .search-input:focus {
+            width: 280px;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(17,24,39,.07);
+            outline: none;
+        }
+
+        /* ─── fadeUp stagger ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up {
+            opacity: 0;
+            animation: fadeUp 0.55s cubic-bezier(.22,1,.36,1) forwards;
+        }
+        /* delay helpers */
+        .delay-0  { animation-delay: 0s;    }
+        .delay-1  { animation-delay: .08s;  }
+        .delay-2  { animation-delay: .16s;  }
+        .delay-3  { animation-delay: .24s;  }
+        .delay-4  { animation-delay: .32s;  }
+        .delay-5  { animation-delay: .40s;  }
+        .delay-6  { animation-delay: .48s;  }
+        .delay-7  { animation-delay: .56s;  }
+
+        /* ─── Metric cards ─── */
+        .metric-card {
+            transition: transform 0.25s cubic-bezier(.22,1,.36,1),
+                        box-shadow 0.25s cubic-bezier(.22,1,.36,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 12px 12px 0 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+        }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.09); }
+        .metric-card:hover::before { transform: scaleX(1); }
+
+        .metric-card.amber::before  { background: var(--accent-amber); }
+        .metric-card.blue::before   { background: var(--accent-blue); }
+        .metric-card.purple::before { background: var(--accent-purple); }
+        .metric-card.red::before    { background: var(--accent-red); }
+
+        /* ─── Action cards (employee) ─── */
+        .action-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s cubic-bezier(.22,1,.36,1),
+                        box-shadow 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        .action-card:hover { transform: translateY(-6px); box-shadow: 0 22px 50px rgba(0,0,0,.1); }
+
+        /* Glow orb */
+        .action-card .glow-orb {
+            position: absolute;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0;
+            pointer-events: none;
+            top: -40px; right: -40px;
+            transition: opacity 0.4s ease;
+        }
+        .action-card:hover .glow-orb { opacity: 0.55; }
+
+        .action-card.blue-card   .glow-orb { background: #bfdbfe; }
+        .action-card.green-card  .glow-orb { background: #bbf7d0; }
+        .action-card.indigo-card .glow-orb { background: #c7d2fe; }
+        .action-card.purple-card .glow-orb { background: #e9d5ff; }
+
+        /* ─── Table rows ─── */
+        .data-row {
+            transition: background 0.15s ease;
+        }
+        .data-row:hover { background: #f9fafb; }
+
+        /* ─── Pill badges ─── */
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: .72rem;
+            font-weight: 500;
+            letter-spacing: .01em;
+        }
+        .pill-badge .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .badge-amber  { background: #fffbeb; color: #92400e; }
+        .badge-amber  .dot { background: #f59e0b; }
+        .badge-blue   { background: #eff6ff; color: #1d4ed8; }
+        .badge-blue   .dot { background: #3b82f6; }
+        .badge-purple { background: #f5f3ff; color: #5b21b6; }
+        .badge-purple .dot { background: #8b5cf6; }
+        .badge-emerald{ background: #ecfdf5; color: #065f46; }
+        .badge-emerald .dot { background: #10b981; }
+
+        /* ─── Sidebar links ─── */
+        .nav-link {
+            transition: background 0.15s ease, color 0.15s ease, padding-left 0.2s ease;
+        }
+        .nav-link:hover { padding-left: 14px; }
+
+        /* ─── Notification dot pulse ─── */
+        .notif-dot {
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+            50%       { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
+        }
+
+        /* ─── AI modal ─── */
+        #ai-modal { animation: none; }
+        #ai-modal.shown > div {
+            animation: fadeUp 0.35s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        /* ─── Big serif numbers ─── */
+        .stat-number {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.9rem;
+            line-height: 1;
+            letter-spacing: -.02em;
+        }
+
+        /* ─── Header title ─── */
+        #dashboard-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.35rem;
+            letter-spacing: -.01em;
+        }
+
+        /* ─── Sidebar brand ─── */
+        .sidebar-brand {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.05rem;
+            line-height: 1.25;
+        }
+
+        /* ─── Sign-in button micro-anim ─── */
+        .signin-btn {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+        .signin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0,0,0,.18);
+        }
+        .signin-btn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased h-screen overflow-hidden flex selection:bg-gray-200 selection:text-gray-900">
+<body class="h-screen overflow-hidden flex flex-col selection:bg-gray-200 selection:text-gray-900">
+<div class="flex flex-1 min-h-0">
 
-    <!-- DASHBOARD VIEW (Behind Login Overlay) -->
-    
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex-col hidden md:flex z-10 relative">
+    <!-- ═══════════════════════════════════════
+         SIDEBAR
+    ═══════════════════════════════════════ -->
+    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-col hidden md:flex z-10 relative min-h-0">
         <div class="h-16 flex items-center px-6 border-b border-gray-200">
-            <div class="text-xl font-semibold tracking-tighter text-gray-900">BCPMS</div>
+            <div class="sidebar-brand text-gray-900">Business Card<br>Automation System</div>
         </div>
-        
+
         <div class="px-4 py-6 flex-1 overflow-y-auto">
             <div class="text-xs font-medium text-gray-400 mb-3 px-2 tracking-wider uppercase">Menu</div>
             <nav class="space-y-1">
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 bg-gray-100 rounded-md text-gray-900 text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 bg-gray-100 rounded-md text-gray-900 text-sm font-medium">
                     <iconify-icon icon="solar:pie-chart-2-linear" class="text-lg"></iconify-icon>
                     <span>Overview</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:card-linear" class="text-lg"></iconify-icon>
                     <span>Upload Requests</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:printer-linear" class="text-lg"></iconify-icon>
                     <span>Printing Queue</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:routing-linear" class="text-lg"></iconify-icon>
                     <span>Dispatch Management</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:box-linear" class="text-lg"></iconify-icon>
                     <span>Print Templates</span>
                 </a>
@@ -61,11 +282,11 @@
 
             <div class="text-xs font-medium text-gray-400 mb-3 px-2 mt-8 tracking-wider uppercase">Administration</div>
             <nav class="space-y-1">
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:users-group-rounded-linear" class="text-lg"></iconify-icon>
                     <span>User Management</span>
                 </a>
-                <a href="#" class="flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium transition-colors">
+                <a href="#" class="nav-link flex items-center space-x-3 px-2 py-2 text-gray-600 hover:bg-gray-50 rounded-md text-sm font-medium">
                     <iconify-icon icon="solar:settings-linear" class="text-lg"></iconify-icon>
                     <span>System Settings</span>
                 </a>
@@ -74,9 +295,7 @@
 
         <div class="p-4 border-t border-gray-200">
             <div class="flex items-center space-x-3 px-2">
-                <div class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
-                    AD
-                </div>
+                <div class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">AD</div>
                 <div>
                     <div class="text-sm font-medium text-gray-900">Admin User</div>
                     <div class="text-xs text-gray-500">System Administrator</div>
@@ -85,227 +304,601 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-full relative z-0">
+    <!-- ═══════════════════════════════════════
+         MAIN CONTENT
+    ═══════════════════════════════════════ -->
+    <main class="flex-1 flex flex-col min-h-0 relative z-0">
+
         <!-- Top Header -->
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-20">
-            <h1 class="text-xl font-medium tracking-tight text-gray-900">System Overview</h1>
+            <h1 id="dashboard-title" class="text-xl tracking-tight text-gray-900">Dashboard</h1>
             <div class="flex items-center space-x-4">
                 <div class="relative hidden sm:block">
-                    <iconify-icon icon="solar:magnifer-linear" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
-                    <input type="text" placeholder="Search requests, batches..." class="pl-9 pr-4 py-1.5 w-64 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 focus:bg-white transition-all placeholder-gray-400">
+                    <iconify-icon icon="solar:magnifer-linear" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none"></iconify-icon>
+                    <input type="text" placeholder="Search requests, batches…"
+                        class="search-input pl-9 pr-4 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm transition-all placeholder-gray-400">
                 </div>
                 <button class="relative p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-md hover:bg-gray-50">
                     <iconify-icon icon="solar:bell-linear" class="text-xl"></iconify-icon>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                    <span class="notif-dot absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                </button>
+                <button id="logout-btn" onclick="logoutUser()"
+                    class="bg-gray-900 text-white text-sm px-4 py-1.5 rounded-md hover:bg-gray-800">
+                    Logout
                 </button>
             </div>
         </header>
 
         <!-- Scrollable Body -->
         <div class="flex-1 overflow-y-auto p-8 bg-gray-50/50">
-            <div class="max-w-6xl mx-auto space-y-8">
-                
-                <!-- Metrics Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- Metric Card -->
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-gray-500">Uploaded Files</span>
-                            <div class="p-2 bg-amber-50 rounded-lg text-amber-600">
-                                <iconify-icon icon="solar:file-check-linear" class="text-lg"></iconify-icon>
+
+            <!-- ══ ADMIN DASHBOARD ══ -->
+            <div id="admin-dashboard">
+                <p class="text-sm text-gray-600 mb-6 fade-up delay-0">Overview of system activity.</p>
+
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <!-- Metric Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                        <div class="metric-card amber bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col fade-up delay-1">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-gray-500">Uploaded Files</span>
+                                <div class="p-2 bg-amber-50 rounded-lg text-amber-600">
+                                    <iconify-icon icon="solar:file-check-linear" class="text-lg"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline space-x-2">
+                                <span class="stat-number text-gray-900">142</span>
+                                <span class="text-xs text-gray-500 font-medium">+12 today</span>
                             </div>
                         </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-2xl font-semibold tracking-tight text-gray-900">142</span>
-                            <span class="text-xs text-gray-500 font-medium">+12 today</span>
+
+                        <div class="metric-card blue bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col fade-up delay-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-gray-500">Ready to Print</span>
+                                <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                                    <iconify-icon icon="solar:printer-minimalistic-linear" class="text-lg"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline space-x-2">
+                                <span class="stat-number text-gray-900">85</span>
+                                <span class="text-xs text-blue-600 font-medium">Batch #402 Active</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card purple bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col fade-up delay-3">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-gray-500">Printed Files</span>
+                                <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
+                                    <iconify-icon icon="solar:routing-2-linear" class="text-lg"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline space-x-2">
+                                <span class="stat-number text-gray-900">50</span>
+                                <span class="text-xs text-gray-500 font-medium">Across 4 branches</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card red bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col fade-up delay-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-sm font-medium text-gray-500">Dispatched Files</span>
+                                <div class="p-2 bg-red-50 rounded-lg text-red-600">
+                                    <iconify-icon icon="solar:danger-triangle-linear" class="text-lg"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="flex items-baseline space-x-2">
+                                <span class="stat-number text-gray-900">24</span>
+                                <span class="text-xs text-red-600 font-medium">Requires attention</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Metric Card -->
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-gray-500">Ready to Print</span>
-                            <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
-                                <iconify-icon icon="solar:printer-minimalistic-linear" class="text-lg"></iconify-icon>
-                            </div>
+                    <!-- Recent Activity Table -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden fade-up delay-5">
+                        <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between bg-white">
+                            <h2 class="text-base font-medium tracking-tight text-gray-900" style="font-family:'DM Serif Display',serif">Recent Upload Requests</h2>
+                            <button class="text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 px-3 py-1.5 rounded-md shadow-sm transition-colors flex items-center space-x-2">
+                                <iconify-icon icon="solar:filter-linear"></iconify-icon>
+                                <span>Filter</span>
+                            </button>
                         </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-2xl font-semibold tracking-tight text-gray-900">3,045</span>
-                            <span class="text-xs text-blue-600 font-medium">Batch #402 Active</span>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 border-b border-gray-200">
+                                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Upload ID</th>
+                                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Branch Code</th>
+                                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Copies</th>
+                                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Upload Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    <tr class="data-row cursor-default fade-up delay-5">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8902</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Downtown Main</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Platinum Credit</td>
+                                        <td class="px-6 py-4">
+                                            <span class="pill-badge badge-amber">
+                                                <span class="dot"></span>Uploaded
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 10:42 AM</td>
+                                    </tr>
+                                    <tr class="data-row cursor-default fade-up delay-6">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8901</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Westside Mall</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Standard Debit</td>
+                                        <td class="px-6 py-4">
+                                            <span class="pill-badge badge-blue">
+                                                <span class="dot"></span>Ready to Print
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 09:15 AM</td>
+                                    </tr>
+                                    <tr class="data-row cursor-default fade-up delay-6">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8899</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">North Hills</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Forex Travel</td>
+                                        <td class="px-6 py-4">
+                                            <span class="pill-badge badge-purple">
+                                                <span class="dot"></span>Printed
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 text-right">Yesterday</td>
+                                    </tr>
+                                    <tr class="data-row cursor-default fade-up delay-7">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8890</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Airport Terminal</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">Premium Debit</td>
+                                        <td class="px-6 py-4">
+                                            <span class="pill-badge badge-emerald">
+                                                <span class="dot"></span>Dispatched
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 text-right">Oct 24, 2023</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Metric Card -->
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-gray-500">Printed Files</span>
-                            <div class="p-2 bg-purple-50 rounded-lg text-purple-600">
-                                <iconify-icon icon="solar:routing-2-linear" class="text-lg"></iconify-icon>
-                            </div>
-                        </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-2xl font-semibold tracking-tight text-gray-900">890</span>
-                            <span class="text-xs text-gray-500 font-medium">Across 4 couriers</span>
-                        </div>
-                    </div>
-
-                    <!-- Metric Card -->
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-gray-500">Dispatched Files</span>
-                            <div class="p-2 bg-red-50 rounded-lg text-red-600">
-                                <iconify-icon icon="solar:danger-triangle-linear" class="text-lg"></iconify-icon>
-                            </div>
-                        </div>
-                        <div class="flex items-baseline space-x-2">
-                            <span class="text-2xl font-semibold tracking-tight text-gray-900">24</span>
-                            <span class="text-xs text-red-600 font-medium">Requires attention</span>
-                        </div>
-                    </div>
                 </div>
+            </div>
 
-                <!-- Recent Activity Table -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between bg-white">
-                        <h2 class="text-base font-medium tracking-tight text-gray-900">Recent Upload Requests</h2>
-                        <button class="text-sm font-medium text-gray-600 hover:text-gray-900 bg-white border border-gray-200 px-3 py-1.5 rounded-md shadow-sm transition-colors flex items-center space-x-2">
-                            <iconify-icon icon="solar:filter-linear"></iconify-icon>
-                            <span>Filter</span>
-                        </button>
+            <!-- ══ EMPLOYEE DASHBOARD ══ -->
+            <div id="employee-dashboard" class="hidden">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <div class="fade-up delay-0">
+                        <h2 class="text-2xl text-gray-900 tracking-tight" style="font-family:'DM Serif Display',serif"><!--Employee Dashboard--></h2>
+                        <p class="text-sm text-gray-500 mt-1">Create and manage your business cards</p>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-50/50 border-b border-gray-200">
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Upload ID</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Branch Code</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Copies</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Upload Date</th>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                        <div class="action-card blue-card bg-white border rounded-2xl p-6 shadow-sm fade-up delay-1">
+                            <div class="glow-orb"></div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                    <iconify-icon icon="solar:printer-linear" class="text-2xl"></iconify-icon>
+                                </div>
+                            </div>
+                            <h3 class="text-lg text-gray-900 mb-2" style="font-family:'DM Serif Display',serif">Physical Card</h3>
+                            <p class="text-sm text-gray-500 mb-9">Generate printable business cards and send for production.</p>
+                            <button class="w-full bg-gray-900 text-white py-2 rounded-md hover:bg-gray-800 transition-colors">Upload Excel &amp; Generate</button>
+                        </div>
+
+                        <div class="action-card green-card bg-white border rounded-2xl p-6 shadow-sm fade-up delay-2">
+                            <div class="glow-orb"></div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-green-50 text-green-600 rounded-lg">
+                                    <iconify-icon icon="solar:smartphone-linear" class="text-2xl"></iconify-icon>
+                                </div>
+                            </div>
+                            <h3 class="text-lg text-gray-900 mb-2" style="font-family:'DM Serif Display',serif">Digital Card</h3>
+                            <p class="text-sm text-gray-500 mb-9">Create a shareable digital business card with QR code.</p>
+                            <button class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">Create Digital Card</button>
+                        </div>
+
+                        <div class="action-card indigo-card bg-white border rounded-2xl p-6 shadow-sm fade-up delay-3">
+                            <div class="glow-orb"></div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                                    <iconify-icon icon="solar:magic-stick-3-linear" class="text-2xl"></iconify-icon>
+                                </div>
+                            </div>
+                            <h3 class="text-lg text-gray-900 mb-2" style="font-family:'DM Serif Display',serif">AI Card Designer</h3>
+                            <p class="text-sm text-gray-500 mb-4">Get smart AI template suggestions based on your role/company.</p>
+                            <button onclick="openAIModal()" class="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors">Generate with AI</button>
+                        </div>
+
+                        <div class="action-card purple-card bg-white border rounded-2xl p-6 shadow-sm fade-up delay-4">
+                            <div class="glow-orb"></div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-purple-50 text-purple-600 rounded-lg">
+                                    <iconify-icon icon="solar:history-linear" class="text-2xl"></iconify-icon>
+                                </div>
+                            </div>
+                            <h3 class="text-lg text-gray-900 mb-2" style="font-family:'DM Serif Display',serif">Previous Uploads</h3>
+                            <p class="text-sm text-gray-500 mb-9">Track status, download files, and manage past requests.</p>
+                            <button class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors">View Upload History</button>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white border rounded-xl shadow-sm overflow-hidden fade-up delay-5">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-sm font-medium text-gray-900" style="font-family:'DM Serif Display',serif">Recent Activity</h3>
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-3 text-left text-gray-500">Request ID</th>
+                                    <th class="p-3 text-left text-gray-500">Type</th>
+                                    <th class="p-3 text-left text-gray-500">Status</th>
+                                    <th class="p-3 text-right text-gray-500">Date</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100 bg-white">
-                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8902</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Downtown Main</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Platinum Credit</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200/50">
-                                            Uploaded
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 10:42 AM</td>
+                            <tbody class="divide-y">
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">REQ-1001</td>
+                                    <td class="p-3">Physical</td>
+                                    <td class="p-3"><span class="pill-badge badge-blue"><span class="dot"></span>Processing</span></td>
+                                    <td class="p-3 text-right text-gray-500">Today</td>
                                 </tr>
-                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8901</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Westside Mall</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Standard Debit</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200/50">
-                                            Ready to Print
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Today, 09:15 AM</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8899</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">North Hills</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Forex Travel</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200/50">
-                                            Printed
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Yesterday</td>
-                                </tr>
-                                <tr class="hover:bg-gray-50/50 transition-colors group cursor-default">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">REQ-8890</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Airport Terminal</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">Premium Debit</td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/50">
-                                            Dispatched
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 text-right">Oct 24, 2023</td>
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">REQ-0998</td>
+                                    <td class="p-3">Digital</td>
+                                    <td class="p-3"><span class="pill-badge badge-emerald"><span class="dot"></span>Completed</span></td>
+                                    <td class="p-3 text-right text-gray-500">Yesterday</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
 
+                </div>
             </div>
-        </div>
+
+            <!-- ══ PRINTER DASHBOARD ══ -->
+            <div id="printer-dashboard" class="hidden">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <div class="fade-up delay-0">
+                        <h2 class="text-2xl text-gray-900 tracking-tight" style="font-family:'DM Serif Display',serif"><!--Printer Dashboard--></h2>
+                        <p class="text-sm text-gray-500 mt-1">Manage and process print jobs efficiently</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="metric-card blue bg-white p-5 rounded-xl border shadow-sm fade-up delay-1">
+                            <p class="text-sm text-gray-500">Pending Prints</p>
+                            <p class="stat-number text-blue-600 mt-1">18</p>
+                        </div>
+                        <div class="metric-card amber bg-white p-5 rounded-xl border shadow-sm fade-up delay-2">
+                            <p class="text-sm text-gray-500">Printed Today</p>
+                            <p class="stat-number text-green-600 mt-1">42</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border rounded-xl shadow-sm overflow-hidden fade-up delay-3">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-sm font-medium text-gray-900" style="font-family:'DM Serif Display',serif">Print Queue</h3>
+                            <button class="text-xs bg-gray-900 text-white px-3 py-1 rounded transition-colors hover:bg-gray-700">Refresh</button>
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-3 text-left text-gray-500">Employee</th>
+                                    <th class="p-3 text-left text-gray-500">Type</th>
+                                    <th class="p-3 text-left text-gray-500">Status</th>
+                                    <th class="p-3 text-left text-gray-500">File</th>
+                                    <th class="p-3 text-right text-gray-500">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">EMP101 - John</td>
+                                    <td class="p-3">Physical</td>
+                                    <td class="p-3"><span class="pill-badge badge-blue"><span class="dot"></span>Ready</span></td>
+                                    <td class="p-3"><button class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 transition-colors">Download</button></td>
+                                    <td class="p-3 text-right space-x-2">
+                                        <button onclick="printCard()" class="bg-gray-900 text-white px-3 py-1 rounded hover:bg-gray-800 transition-colors">Print</button>
+                                        <button class="bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200 transition-colors">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">EMP202 - Sarah</td>
+                                    <td class="p-3">Digital</td>
+                                    <td class="p-3"><span class="pill-badge badge-emerald"><span class="dot"></span>Completed</span></td>
+                                    <td class="p-3"><button class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 transition-colors">View</button></td>
+                                    <td class="p-3 text-right"><span class="text-xs text-gray-400">Done</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ══ DISPATCHER DASHBOARD ══ -->
+            <div id="dispatcher-dashboard" class="hidden">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <div class="fade-up delay-0">
+                        <h2 class="text-2xl text-gray-900 tracking-tight" style="font-family:'DM Serif Display',serif"><!--Dispatcher Dashboard--></h2>
+                        <p class="text-sm text-gray-500 mt-1">Track and manage delivery of printed cards</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="metric-card purple bg-white p-5 rounded-xl border shadow-sm fade-up delay-1">
+                            <p class="text-sm text-gray-500">Ready for Dispatch</p>
+                            <p class="stat-number text-purple-600 mt-1">14</p>
+                        </div>
+                        <div class="metric-card amber bg-white p-5 rounded-xl border shadow-sm fade-up delay-2">
+                            <p class="text-sm text-gray-500">Dispatched Today</p>
+                            <p class="stat-number text-green-600 mt-1">27</p>
+                        </div>
+                        <div class="metric-card red bg-white p-5 rounded-xl border shadow-sm fade-up delay-3">
+                            <p class="text-sm text-gray-500">Delayed</p>
+                            <p class="stat-number text-red-500 mt-1">3</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border rounded-xl shadow-sm overflow-hidden fade-up delay-4">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-sm font-medium text-gray-900" style="font-family:'DM Serif Display',serif">Dispatch Queue</h3>
+                            <button class="text-xs bg-gray-900 text-white px-3 py-1 rounded hover:bg-gray-700 transition-colors">Refresh</button>
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-3 text-left text-gray-500">Employee</th>
+                                    <th class="p-3 text-left text-gray-500">Status</th>
+                                    <th class="p-3 text-left text-gray-500">Location</th>
+                                    <th class="p-3 text-right text-gray-500">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">EMP101 - John</td>
+                                    <td class="p-3"><span class="pill-badge badge-purple"><span class="dot"></span>Printed</span></td>
+                                    <td class="p-3">Bangalore HQ</td>
+                                    <td class="p-3 text-right space-x-2">
+                                        <button class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors">Dispatch</button>
+                                        <button class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 transition-colors">Delay</button>
+                                    </td>
+                                </tr>
+                                <tr class="data-row">
+                                    <td class="p-3 font-medium">EMP305 - Alex</td>
+                                    <td class="p-3"><span class="pill-badge badge-emerald"><span class="dot"></span>Dispatched</span></td>
+                                    <td class="p-3">Mumbai Branch</td>
+                                    <td class="p-3 text-right"><span class="text-xs text-gray-400">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div><!-- /scrollable body -->
     </main>
 
-    <!-- LOGIN OVERLAY -->
-    <!-- This overlay represents the initial state. Clicking Sign In removes it to show the dashboard beneath. -->
-    <div id="login-overlay" class="fixed inset-0 z-50 bg-gray-50/90 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
-        
-        <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden relative">
-            
-            <!-- Subtle top accent -->
+    <!-- ═══════════════════════════════════════
+         LOGIN OVERLAY
+    ═══════════════════════════════════════ -->
+    <div id="login-overlay" class="fixed inset-0 z-50 bg-gray-50/90 backdrop-blur-sm flex items-center justify-center p-4">
+
+        <div class="login-card w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden relative">
             <div class="h-1 w-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 opacity-50"></div>
-            
+
             <div class="p-8">
                 <div class="flex justify-center mb-8">
-                    <div class="text-2xl font-semibold tracking-tighter text-gray-900">Bank Business Card Print Management System</div>
+                    <div class="text-center" style="font-family:'DM Serif Display',serif;font-size:1.25rem;line-height:1.3;color:#111">
+                        Business Card<br>Automation System
+                    </div>
                 </div>
 
                 <div class="text-center mb-6">
-                    <h2 class="text-lg font-medium tracking-tight text-gray-900">Welcome back</h2>
+                    <h2 class="text-lg font-medium tracking-tight text-gray-900" style="font-family:'DM Serif Display',serif">Welcome back</h2>
                     <p class="text-sm text-gray-500 mt-1">Select your role to access the portal</p>
                 </div>
 
-                <!-- Role Selector (Segmented Control) -->
+                <!-- Role Tabs -->
                 <div class="flex p-1 space-x-1 bg-gray-100/80 rounded-lg mb-6 border border-gray-200/50">
                     <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="true" onclick="selectRole(this)">Admin</button>
-                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Bank Eployee</button>
+                    <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Employee</button>
                     <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Printer</button>
                     <button class="role-tab flex-1 py-1.5 text-xs font-medium rounded-md" data-active="false" onclick="selectRole(this)">Dispatcher</button>
                 </div>
 
-                <form onsubmit="event.preventDefault(); document.getElementById('login-overlay').style.opacity='0'; setTimeout(() => document.getElementById('login-overlay').remove(), 300);" class="space-y-4">
-                    
-                    <div class="space-y-1">
-                        <label for="username" class="block text-xs font-medium text-gray-700">Admin ID / Username</label>
-                        <input type="text" id="username" value="admin" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-shadow" placeholder="Enter your ID">
+                <form onsubmit="loginUser(event)" class="space-y-4">
+
+                    <!-- Admin fields -->
+                    <div id="admin-fields">
+                        <div class="space-y-1 mb-3">
+                            <label class="block text-xs font-medium text-gray-700">Admin Username</label>
+                            <input type="text" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="Enter Admin Username">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-gray-700">Password</label>
+                            <input type="password" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="••••••••">
+                        </div>
                     </div>
 
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="block text-xs font-medium text-gray-700">Password</label>
+                    <!-- Employee fields -->
+                    <div id="employee-fields" style="display:none">
+                        <div class="space-y-1 mb-3">
+                            <label class="block text-xs font-medium text-gray-700">Branch ID</label>
+                            <input type="text" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="Enter Branch ID">
                         </div>
-                        <input type="password" id="password" value="" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-shadow" placeholder="••••••••">
+                        <div class="space-y-1 mb-3">
+                            <label class="block text-xs font-medium text-gray-700">Employee ID</label>
+                            <input type="text" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="Enter Employee ID">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-gray-700">Password</label>
+                            <input type="password" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <!-- Printer fields -->
+                    <div id="printer-fields" style="display:none">
+                        <div class="space-y-1 mb-3">
+                            <label class="block text-xs font-medium text-gray-700">Printer ID</label>
+                            <input type="text" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="Enter Printer ID">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-gray-700">Password</label>
+                            <input type="password" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <!-- Dispatcher fields -->
+                    <div id="dispatcher-fields" style="display:none">
+                        <div class="space-y-1 mb-3">
+                            <label class="block text-xs font-medium text-gray-700">Dispatcher ID</label>
+                            <input type="text" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="Enter Dispatcher ID">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-gray-700">Password</label>
+                            <input type="password" class="appearance-none block w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50/50 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition" placeholder="••••••••">
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-2 pb-4">
                         <div class="flex items-center">
-                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-gray-900 focus:ring-gray-900 border-gray-300 rounded cursor-pointer accent-gray-900">
-                            <label for="remember-me" class="ml-2 block text-xs text-gray-600 cursor-pointer">
-                                Remember me
-                            </label>
+                            <input type="checkbox" class="h-4 w-4 border-gray-300 rounded cursor-pointer accent-gray-900">
+                            <label class="ml-2 block text-xs text-gray-600">Remember me</label>
                         </div>
                         <a href="#" class="text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
+                    <button type="submit" class="signin-btn w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800">
                         Sign In
                     </button>
                 </form>
-
             </div>
         </div>
     </div>
 
+    <!-- ═══════════════════════════════════════
+         AI MODAL
+    ═══════════════════════════════════════ -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl">
+            <h2 class="text-lg mb-4" style="font-family:'DM Serif Display',serif">AI Card Design Generator</h2>
+            <input id="roleInput" type="text" placeholder="Enter Role (e.g. Software Engineer)"
+                class="w-full border p-2 rounded mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition">
+            <input id="companyInput" type="text" placeholder="Enter Company (e.g. Google)"
+                class="w-full border p-2 rounded mb-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300 transition">
+            <button onclick="generateDesign()"
+                class="w-full bg-indigo-600 text-white py-2 rounded mb-4 hover:bg-indigo-700 transition-colors">Generate Design</button>
+            <div id="ai-result" class="text-sm text-gray-700 whitespace-pre-line"></div>
+            <button onclick="closeAIModal()" class="mt-4 text-sm text-gray-500 hover:text-gray-900 transition-colors">Close</button>
+        </div>
+    </div>
+
     <script>
-        // Simple script to handle role tab visual switching for the mockup
+        /* ── Role selector ── */
         function selectRole(element) {
-            const tabs = document.querySelectorAll('.role-tab');
-            tabs.forEach(tab => tab.setAttribute('data-active', 'false'));
+            document.querySelectorAll('.role-tab').forEach(t => t.setAttribute('data-active', 'false'));
             element.setAttribute('data-active', 'true');
+            const role = element.innerText;
+            ['admin','employee','printer','dispatcher'].forEach(r => {
+                document.getElementById(r+'-fields').style.display = 'none';
+            });
+            const map = { Admin:'admin', Employee:'employee', Printer:'printer', Dispatcher:'dispatcher' };
+            document.getElementById(map[role]+'-fields').style.display = 'block';
+        }
+
+        /* ── Login with fade-out ── */
+        function loginUser(event) {
+            event.preventDefault();
+            const activeRole = document.querySelector('.role-tab[data-active="true"]').innerText;
+            const overlay = document.getElementById('login-overlay');
+
+            overlay.classList.add('fade-out');
+
+            setTimeout(() => {
+                overlay.remove();
+
+                ['admin','employee','printer','dispatcher'].forEach(r => {
+                    document.getElementById(r+'-dashboard').style.display = 'none';
+                });
+
+                const map = { Admin:'admin', Employee:'employee', Printer:'printer', Dispatcher:'dispatcher' };
+                const key = map[activeRole];
+                document.getElementById(key+'-dashboard').style.display = 'block';
+
+                if (activeRole === 'Admin') {
+                    document.getElementById('sidebar').style.display = 'flex';
+                    document.getElementById('dashboard-title').innerText = 'Admin Dashboard';
+                } else {
+                    document.getElementById('sidebar').style.display = 'none';
+                    document.getElementById('dashboard-title').innerText = activeRole + ' Dashboard';
+                }
+
+                /* re-trigger fade-up animations */
+                document.querySelectorAll('#'+key+'-dashboard .fade-up').forEach(el => {
+                    el.style.animation = 'none';
+                    el.offsetHeight; /* reflow */
+                    el.style.animation = '';
+                });
+
+            }, 420);
+        }
+
+        /* ── Print ── */
+        function printCard() {
+            if (confirm("Do you want to print?")) {
+                alert("Printing started and status updated.");
+            } else {
+                alert("Printing cancelled.");
+            }
+        }
+
+        /* ── Logout ── */
+        function logoutUser() { location.reload(); }
+
+        /* ── AI Modal ── */
+        function openAIModal() {
+            const modal = document.getElementById('ai-modal');
+            modal.style.display = 'flex';
+            modal.classList.add('shown');
+        }
+        function closeAIModal() {
+            document.getElementById('ai-modal').style.display = 'none';
+        }
+
+        async function generateDesign() {
+            const role    = document.getElementById('roleInput').value;
+            const company = document.getElementById('companyInput').value;
+            const resultBox = document.getElementById('ai-result');
+            resultBox.innerText = 'Generating design…';
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        messages: [{
+                            role: 'user',
+                            content: `Suggest a professional business card design for a ${role} at ${company}. Include: - Color palette - Layout style - Font suggestions - Extra styling ideas`
+                        }]
+                    })
+                });
+                const data = await response.json();
+                resultBox.innerText = data.content.map(b => b.text || '').join('\n');
+            } catch (err) {
+                resultBox.innerText = 'Error generating design.';
+                console.error(err);
+            }
         }
     </script>
+</div>
 </body>
 </html>

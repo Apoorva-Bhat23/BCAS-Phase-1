@@ -60,47 +60,64 @@ const data = XLSX.utils.sheet_to_json(sheet);
 
 
 // =========================
-// Generate PDF
+// Generate PDF (20 Cards Grid Layout)
 // =========================
 
-const pdfName = Date.now()+".pdf";
+const pdfName = Date.now() + ".pdf";
+const pdfPath = "generated_pdfs/" + pdfName;
 
-const pdfPath = "generated_pdfs/"+pdfName;
-
-const doc = new PDFDocument();
+const doc = new PDFDocument({
+size: "A3",
+margin: 20
+});
 
 doc.pipe(fs.createWriteStream(pdfPath));
 
-data.forEach(row=>{
+const cardWidth = 150;
+const cardHeight = 120;
 
-doc.fontSize(16).text(`Name: ${row.FirstName || ""} ${row.LastName || ""}`);
+const cardsPerRow = 5;
+const cardsPerColumn = 4;
 
-doc.moveDown();
+let x = 20;
+let y = 20;
 
-doc.fontSize(12).text(`Job: ${row.Job || ""}`);
-doc.text(`Company: ${row.Company || ""}`);
-doc.text(`Organization: ${row.Organization || ""}`);
+let count = 0;
 
-doc.moveDown();
+data.forEach(row => {
+    const copies = Number(row["Copies"] || row["copies"] || 1);
 
-doc.text(`Email: ${row.Email || ""}`);
-doc.text(`Phone: ${row.Phone || ""}`);
-doc.text(`Website: ${row.Website || ""}`);
+for(let i=0;i<copies;i++){
 
-doc.moveDown();
+doc.rect(x, y, cardWidth, cardHeight).stroke();
 
-doc.text(`Birthday: ${row.Birthday || ""}`);
+doc.fontSize(10).text(`${row.FirstName || ""} ${row.LastName || ""}`, x + 10, y + 10);
 
-doc.moveDown();
+doc.fontSize(9).text(`${row.Job || ""}`, x + 10, y + 25);
 
-doc.text(`Address: ${row.Address || ""}`);
-doc.text(`${row.Street || ""}`);
-doc.text(`${row.City || ""}, ${row.State || ""} ${row.Zipcode || ""}`);
-doc.text(`${row.Country || ""}`);
+doc.text(`${row.Company || ""}`, x + 10, y + 40);
 
-doc.moveDown();
-doc.moveDown();
+doc.text(`Email: ${row.Email || ""}`, x + 10, y + 55);
 
+doc.text(`Phone: ${row.Phone || ""}`, x + 10, y + 70);
+
+doc.text(`${row.Website || ""}`, x + 10, y + 85);
+
+count++;
+
+x += cardWidth + 10;
+
+if (count % cardsPerRow === 0) {
+x = 20;
+y += cardHeight + 10;
+}
+
+if (count % (cardsPerRow * cardsPerColumn) === 0) {
+doc.addPage();
+x = 20;
+y = 20;
+}
+}
 });
 
 doc.end();
@@ -112,8 +129,9 @@ doc.end();
 
 const query =
 "INSERT INTO uploads (file_name,copies,status) VALUES (?,?,?)";
+const totalCopies = data.reduce((sum,row)=> sum + Number(row.Copies || 1),0);
 
-db.query(query,[req.file.filename,data.length,"Ready to Print"],(err,result)=>{
+db.query(query,[req.file.filename,totalCopies,"Ready to Print"],(err,result)=>{
 
 if(err){
 return res.status(500).json(err);
