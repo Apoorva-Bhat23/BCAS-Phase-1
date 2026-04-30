@@ -7,6 +7,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const printerRoutes = require("./routes/printerRoutes");
 const dispatcherRoutes = require("./routes/dispatcherRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api", uploadRoutes);
 app.use("/api/printer",printerRoutes);
 app.use("/api/dispatcher", dispatcherRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", aiRoutes);
 
 // start server
 app.listen(5000, () => {

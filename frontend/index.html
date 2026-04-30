@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -499,7 +501,7 @@
                             </div>
                             <h3 class="text-lg text-gray-900 mb-2" style="font-family:'DM Serif Display',serif">Digital Card</h3>
                             <p class="text-sm text-gray-500 mb-9">Create a shareable digital business card with QR code.</p>
-                            <button class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">Create Digital Card</button>
+                            <button onclick="openCardForm()" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors">Create Digital Card</button>
                         </div>
 
                         <div class="action-card indigo-card bg-white border rounded-2xl p-6 shadow-sm fade-up delay-3">
@@ -561,6 +563,126 @@
                 </div>
             </div>
 
+<!-- DIGITAL CARD FORM after the button is clicked-->
+<div id="card-form" style="display:none" class="absolute inset-0 p-8 bg-gradient-to-br from-blue-100 via-white to-green-100 overflow-y-auto">
+
+<h2 class="text-2xl font-semibold mb-6">Create Digital Business Card</h2>
+
+<div class="max-w-4xl space-y-6">
+
+<!-- PROFILE -->
+<div>
+<p class="text-gray-700 font-medium mb-2">Profile</p>
+
+<div class="grid grid-cols-2 gap-4">
+<input id="firstName" placeholder="First Name" class="border p-3 rounded-lg bg-white">
+<input id="lastName" placeholder="Last Name" class="border p-3 rounded-lg bg-white">
+</div>
+
+<input id="image" placeholder="Picture URL" class="border p-3 rounded-lg w-full mt-3 bg-white">
+
+</div>
+
+<!-- BIRTHDAY -->
+<div>
+<p class="text-gray-700 font-medium mb-2">Birthday</p>
+<input id="birthday" type="date" class="border p-3 rounded-lg w-full bg-white">
+</div>
+
+<!-- ORGANIZATION -->
+<div>
+<p class="text-gray-700 font-medium mb-2">Organization</p>
+
+<div class="grid grid-cols-2 gap-4">
+<input id="company" placeholder="Company" class="border p-3 rounded-lg bg-white">
+<input id="designation" placeholder="Job" class="border p-3 rounded-lg bg-white">
+</div>
+
+<div class="grid grid-cols-2 gap-4 mt-3">
+<input id="email" placeholder="Email" class="border p-3 rounded-lg bg-white">
+<input id="phone" placeholder="Phone" class="border p-3 rounded-lg bg-white">
+</div>
+
+<input id="website" placeholder="Website" class="border p-3 rounded-lg w-full mt-3 bg-white">
+
+</div>
+
+<!-- ADDRESS -->
+<div>
+<p class="text-gray-700 font-medium mb-2">Address</p>
+
+<input id="street" placeholder="Street" class="border p-3 rounded-lg w-full bg-white mb-3">
+
+<div class="grid grid-cols-2 gap-4">
+<input id="city" placeholder="City" class="border p-3 rounded-lg bg-white">
+<input id="zip" placeholder="Zipcode" class="border p-3 rounded-lg bg-white">
+</div>
+
+<div class="grid grid-cols-2 gap-4 mt-3">
+<input id="state" placeholder="State" class="border p-3 rounded-lg bg-white">
+<input id="country" placeholder="Country" class="border p-3 rounded-lg bg-white">
+</div>
+
+</div>
+
+<!-- GENERATE BUTTON -->
+<button onclick="generateCard()" 
+class="w-full bg-gray-900 text-white py-3 rounded-lg mt-4 hover:bg-gray-800">
+Generate
+</button>
+
+</div>
+</div>
+
+<!-- RESULT final card looks -->
+<!-- RESULT -->
+<div id="card-result" style="display:none" 
+class="fixed inset-0 flex items-center justify-center bg-gray-100">
+
+<div id="card-preview" 
+class="w-[720px] rounded-2xl p-8 shadow-xl"
+style="background: linear-gradient(135deg,#e5e7eb,#dbeafe,#dcfce7);">
+
+<div class="flex justify-between items-start">
+
+<!-- LEFT -->
+<div>
+<h2 id="card-name" class="text-3xl font-semibold mb-4"></h2>
+
+<p id="field-company"><b>Company:</b> <span id="card-company"></span></p>
+<p id="field-role"><b>Role:</b> <span id="card-role"></span></p>
+<p id="field-email"><b>Email:</b> <span id="card-email"></span></p>
+<p id="field-phone"><b>Phone:</b> <span id="card-phone"></span></p>
+<p id="field-website"><b>Website:</b> <span id="card-website"></span></p>
+<p id="field-location"><b>Location:</b> <span id="card-location"></span></p>
+</div>
+
+<!-- RIGHT -->
+<div class="text-center">
+<canvas id="qr" class="mb-2"></canvas>
+</div>
+
+</div>
+
+<hr class="my-6">
+
+<div class="flex gap-4 justify-center">
+<button onclick="editCard()" 
+class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Edit</button>
+
+<button onclick="downloadPNG()" 
+class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+Download PNG
+</button>
+
+<button onclick="downloadVCF()" 
+class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+Download VCF
+</button>
+</div>
+
+</div>
+</div>
             <!-- ══ PRINTER DASHBOARD ══ -->
             <div id="printer-dashboard" class="hidden">
                 <div class="max-w-6xl mx-auto space-y-8">
@@ -871,33 +993,136 @@
         function closeAIModal() {
             document.getElementById('ai-modal').style.display = 'none';
         }
+//template Genrate with AI
+        async function generateDesign(){
 
-        async function generateDesign() {
-            const role    = document.getElementById('roleInput').value;
-            const company = document.getElementById('companyInput').value;
-            const resultBox = document.getElementById('ai-result');
-            resultBox.innerText = 'Generating design…';
+const role = document.getElementById("roleInput").value;
+const company = document.getElementById("companyInput").value;
+const resultBox = document.getElementById("ai-result");
 
-            try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1000,
-                        messages: [{
-                            role: 'user',
-                            content: `Suggest a professional business card design for a ${role} at ${company}. Include: - Color palette - Layout style - Font suggestions - Extra styling ideas`
-                        }]
-                    })
-                });
-                const data = await response.json();
-                resultBox.innerText = data.content.map(b => b.text || '').join('\n');
-            } catch (err) {
-                resultBox.innerText = 'Error generating design.';
-                console.error(err);
-            }
-        }
+resultBox.innerText = "Generating AI suggestion...";
+
+const response = await fetch("http://localhost:5000/api/ai/design",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({role,company})
+});
+
+const data = await response.json();
+
+resultBox.innerText = data.suggestion;
+
+}
+
+//generate digital card function
+function openCardForm() {
+    // hide employee dashboard
+    document.getElementById("employee-dashboard").style.display = "none";
+
+    // show form
+    document.getElementById("card-form").style.display = "block";
+
+    // hide result if already open
+    document.getElementById("card-result").style.display = "none";
+}
+function generateCard(){
+
+const first = document.getElementById("firstName").value;
+const last = document.getElementById("lastName").value;
+const name = (first + " " + last).trim();
+
+const role = document.getElementById("designation").value;
+const company = document.getElementById("company").value;
+const phone = document.getElementById("phone").value;
+const email = document.getElementById("email").value;
+const website = document.getElementById("website").value;
+const city = document.getElementById("city").value;
+const country = document.getElementById("country").value;
+const location = (city || country) ? city + ", " + country : "";
+
+// switch UI
+document.getElementById("card-form").style.display="none";
+document.getElementById("card-result").style.display="flex";
+
+// fill data
+document.getElementById("card-name").innerText = name;
+document.getElementById("card-role").innerText = role;
+document.getElementById("card-company").innerText = company;
+document.getElementById("card-phone").innerText = phone;
+document.getElementById("card-email").innerText = email;
+document.getElementById("card-website").innerText = website;
+document.getElementById("card-location").innerText = location;
+
+// 🧠 Hide empty fields
+toggleField("field-company", company);
+toggleField("field-role", role);
+toggleField("field-email", email);
+toggleField("field-phone", phone);
+toggleField("field-website", website);
+toggleField("field-location", location);
+
+// 📇 vCard data
+const vCard =
+`BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+ORG:${company}
+TITLE:${role}
+TEL:${phone}
+EMAIL:${email}
+URL:${website}
+END:VCARD`;
+
+// ✅ FIXED QR CODE
+const canvas = document.getElementById('qr');
+canvas.innerHTML = ""; // reset
+
+QRCode.toCanvas(canvas, vCard, function (error) {
+    if (error) console.error(error);
+});
+
+}
+function downloadPNG() {
+    html2canvas(document.getElementById("card-preview")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "business-card.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+function downloadVCF() {
+    const name = document.getElementById("card-name").innerText;
+    const phone = document.getElementById("card-phone").innerText;
+    const email = document.getElementById("card-email").innerText;
+
+    const vCard =
+`BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+TEL:${phone}
+EMAIL:${email}
+END:VCARD`;
+
+    const blob = new Blob([vCard], { type: "text/vcard" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "contact.vcf";
+    link.click();
+}
+function editCard() {
+    document.getElementById("card-result").style.display = "none";
+    document.getElementById("card-form").style.display = "block";
+}
+function toggleField(id, value){
+    const el = document.getElementById(id);
+    if(!value || value.trim() === ""){
+        el.style.display = "none";
+    } else {
+        el.style.display = "block";
+    }
+}
     </script>
 </div>
 </body>
