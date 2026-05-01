@@ -3,7 +3,7 @@ const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Gemini API key
-const genAI = new GoogleGenerativeAI("AIzaSyAp7KxGFshE_1DCpN6myIpMuSHqawWDqFw");
+const genAI = new GoogleGenerativeAI("");
 
 // POST /api/ai/design
 router.post("/ai/design", async (req, res) => {
